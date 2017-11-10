@@ -1,0 +1,50 @@
+packrat/lib*/
+.Rproj.user
+
+SPLMM test script
+library(Matrix)
+library(mvtnorm)
+
+lambda_0=10000
+lambda_1= 5
+lambda_2=3
+
+n=200
+d=50
+varied_k<-NULL
+weightz<-NULL
+
+for(k in 1:50){
+w = c(rep(1,d-k), rep(0,k))
+
+accura<-NULL
+
+for(j in 1:50){
+  xx<-matrix(runif(n*d,-1,1),d,n)
+  xxx = scale(t(xx))
+  attr(xxx, "scaled:center")<-NULL
+  attr(xxx, "scaled:scale")<-NULL
+  x = t(xxx)
+  sigma = lambda_1 * diag(n)+ lambda_2*t(x)%*%x
+
+
+  #+t(rmvnorm(n=1, mean=rep(0,n), sigma))
+  y<-t(x)%*%w
+
+  for(i in 1:n){ if(y[i]<1e-10 ){y[i]=-1}else{y[i]=1}}
+  print("Calibrating sample : "); print(j)
+  test<-splmm(x,as.numeric(y),lambda_0,lambda_1,lambda_2)
+  init_w<-test$init_w
+  init_w_prime<-test$init_w_prime
+  test$opts(useGrad = TRUE, verbose = TRUE, rho = 2)
+  #, init_w = test$init_w, init_w_prime=test$init_w_prime)
+  test$fit()
+  weightz<-cbind(weights,t(test$weights()))
+
+  accura<-rbind(accura,test$accuracy(x,as.numeric(y),1e-2,1e-4))
+}
+
+
+varied_k <- rbind(varied_k, mean(accura))
+}
+

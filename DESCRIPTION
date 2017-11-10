@@ -1,0 +1,10 @@
+Package: SPLMM
+Type: Package
+Title: SPLMM 
+Version: 1.0
+Date: 2017-11-05
+Author: Cavit Hafizoglu
+Maintainer: Cavit Hafizoglu <cavit.hafizoglu@gmail.com>
+Description: 
+License: GPL (>= 2)
+
